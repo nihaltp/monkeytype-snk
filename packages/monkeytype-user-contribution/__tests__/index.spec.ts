@@ -17,11 +17,16 @@ test("getMonkeytypeUserContribution with profile endpoint", async () => {
   })))) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user");
-  expect(cells.length).toBe(5);
-  expect(cells[1].count).toBe(10);
-  // max is 20. 10/20 * 4 = 2.
-  expect(cells[1].level).toBe(2);
-  expect(cells[2].level).toBe(4);
+  expect(cells.length).toBe(371); // Should be padded
+
+  // Last 5 elements should match input
+  const last5 = cells.slice(-5);
+  expect(last5[1].count).toBe(10);
+  expect(last5[1].level).toBe(2);
+  expect(last5[2].level).toBe(4);
+
+  // First element should be 0 (padded)
+  expect(cells[0].count).toBe(0);
 });
 
 test("getMonkeytypeUserContribution with apeKey", async () => {
@@ -38,7 +43,8 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
   }) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user", { apeKey: "key" });
-  expect(cells.length).toBe(3);
-  expect(cells[0].count).toBe(5);
-  expect(cells[0].level).toBe(4);
+  expect(cells.length).toBe(371);
+  const last3 = cells.slice(-3);
+  expect(last3[0].count).toBe(5);
+  expect(last3[0].level).toBe(4);
 });

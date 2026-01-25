@@ -29,7 +29,11 @@ export const getMonkeytypeUserContribution = async (
   // currentTestActivity: data.testsByDays
   const testsByDays: (number | null)[] = json.data?.testsByDays ?? json.data?.testActivity?.testsByDays ?? [];
 
-  const rawDays = testsByDays.slice(-371);
+  let rawDays = testsByDays.slice(-371);
+  if (rawDays.length < 371) {
+      const padding = new Array(371 - rawDays.length).fill(0);
+      rawDays = [...padding, ...rawDays];
+  }
 
   const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
   const today = new Date();
