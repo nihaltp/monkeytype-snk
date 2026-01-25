@@ -16,7 +16,7 @@
  */
 export const getGithubUserContribution = async (
   userName: string,
-  o: { githubToken: string },
+  _o: { githubToken: string },
 ) => {
   const res = await fetch(`https://api.monkeytype.com/users/${userName}/profile?isUid=false`);
   const json = await res.json();
