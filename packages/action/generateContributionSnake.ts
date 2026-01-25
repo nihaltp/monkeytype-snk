@@ -1,4 +1,4 @@
-import { getGithubUserContribution } from "@snk/github-user-contribution";
+import { getMonkeytypeUserContribution } from "@snk/monkeytype-user-contribution";
 import { userContributionToGrid } from "./userContributionToGrid";
 import { getBestRoute } from "@snk/solver/getBestRoute";
 import { snake4 } from "@snk/types/__fixtures__/snake";
@@ -13,10 +13,10 @@ export const generateContributionSnake = async (
     drawOptions: DrawOptions;
     animationOptions: AnimationOptions;
   } | null)[],
-  options: { githubToken: string },
+  options?: { monkeytypeApeKey?: string }
 ) => {
-  console.log("🎣 fetching github user contribution");
-  const cells = await getGithubUserContribution(userName, options);
+  console.log("🎣 fetching monkeytype user contribution");
+  const cells = await getMonkeytypeUserContribution(userName, { apeKey: options?.monkeytypeApeKey });
 
   const grid = userContributionToGrid(cells);
   const snake = snake4;

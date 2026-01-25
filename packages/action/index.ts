@@ -5,7 +5,8 @@ import * as githubAction from "./github-action";
 
 (async () => {
   try {
-    const userName = githubAction.getInput("github_user_name");
+    const userName = githubAction.getInput("monkeytype_user_name");
+    const monkeytypeApeKey = githubAction.getInput("monkeytype_ape_key");
     const outputsRaw = [
       ...githubAction.getInput("outputs").split("\n"),
       //
@@ -17,15 +18,11 @@ import * as githubAction from "./github-action";
       .filter(Boolean);
 
     const outputs = parseOutputsOption(outputsRaw);
-    const githubToken =
-      process.env.GITHUB_TOKEN ?? githubAction.getInput("github_token");
 
     const { generateContributionSnake } = await import(
       "./generateContributionSnake"
     );
-    const results = await generateContributionSnake(userName, outputs, {
-      githubToken,
-    });
+    const results = await generateContributionSnake(userName, outputs, { monkeytypeApeKey });
 
     outputs.forEach((out, i) => {
       const result = results[i];
