@@ -16,84 +16,28 @@
  */
 export const getGithubUserContribution = async (
   userName: string,
-  o: { githubToken: string },
 ) => {
-  const query = /* GraphQL */ `
-    query ($login: String!) {
-      user(login: $login) {
-        contributionsCollection {
-          contributionCalendar {
-            weeks {
-              contributionDays {
-                contributionCount
-                contributionLevel
-                weekday
-                date
-              }
-            }
-          }
-        }
-      }
+  const res = await fetch(`https://api.monkeytype.com/users/${userName}/profile?isUid=false`);
+  const json = await res.json();
+  const testsByDays: (number | null)[] = json.data?.testActivity?.testsByDays ?? [];
+  const rawDays = testsByDays.slice(-371); 
+  const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
+  const cells = rawDays.map((count, index) => {
+    const val = count || 0;
+    let level = 0;
+    if (val > 0) {
+      level = Math.ceil((val / maxTests) * 4);
     }
-  `;
-  const variables = { login: userName };
 
-  const res = await fetch("https://api.github.com/graphql", {
-    headers: {
-      Authorization: `bearer ${o.githubToken}`,
-      "Content-Type": "application/json",
-      "User-Agent": "me@platane.me",
-    },
-    method: "POST",
-    body: JSON.stringify({ variables, query }),
+    return {
+      x: Math.floor(index / 7), // Column (Week)
+      y: index % 7,             // Row (Day)
+      count: val,
+      level: level,             // Required by snk
+    };
   });
 
-  if (!res.ok) throw new Error(await res.text().catch(() => res.statusText));
-
-  const { data, errors } = (await res.json()) as {
-    data: GraphQLRes;
-    errors?: { message: string }[];
-  };
-
-  if (errors?.[0]) throw errors[0];
-
-  return data.user.contributionsCollection.contributionCalendar.weeks.flatMap(
-    ({ contributionDays }, x) =>
-      contributionDays.map((d) => ({
-        x,
-        y: d.weekday,
-        date: d.date,
-        count: d.contributionCount,
-        level:
-          (d.contributionLevel === "FOURTH_QUARTILE" && 4) ||
-          (d.contributionLevel === "THIRD_QUARTILE" && 3) ||
-          (d.contributionLevel === "SECOND_QUARTILE" && 2) ||
-          (d.contributionLevel === "FIRST_QUARTILE" && 1) ||
-          0,
-      })),
-  );
-};
-
-type GraphQLRes = {
-  user: {
-    contributionsCollection: {
-      contributionCalendar: {
-        weeks: {
-          contributionDays: {
-            contributionCount: number;
-            contributionLevel:
-              | "FOURTH_QUARTILE"
-              | "THIRD_QUARTILE"
-              | "SECOND_QUARTILE"
-              | "FIRST_QUARTILE"
-              | "NONE";
-            date: string;
-            weekday: number;
-          }[];
-        }[];
-      };
-    };
-  };
+  return cells;
 };
 
 export type Res = Awaited<ReturnType<typeof getGithubUserContribution>>;
