@@ -4,7 +4,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@snk/gif-creator": "1.0.0",
-    "@snk/github-user-contribution": "1.0.0",
+    "@snk/monkeytype-user-contribution": "1.0.0",
     "@snk/solver": "1.0.0",
     "@snk/svg-creator": "1.0.0",
     "@snk/types": "1.0.0"

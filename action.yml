@@ -1,19 +1,18 @@
-name: "generate-snake-game-from-github-contribution-grid"
-description: "Generates a snake game from a github user contributions grid. Output the animation as gif or svg"
+name: "generate-snake-game-from-monkeytype-contribution-grid"
+description: "Generates a snake game from a monkeytype user contributions grid. Output the animation as gif or svg"
 author: "platane"
 
 runs:
   using: docker
-  image: docker://platane/snk@sha256:b107f810d467a26b1e7ac46751073d1247728421155a47e77f6cd2dc66dcc74c
+  image: Dockerfile
 
 inputs:
-  github_user_name:
-    description: "github user name"
+  monkeytype_user_name:
+    description: "monkeytype user name"
     required: true
-  github_token:
-    description: "github token used to fetch the contribution calendar. Default to the action token if empty."
+  monkeytype_ape_key:
+    description: "monkeytype ape key. Required if you want to fetch current user activity that is not public."
     required: false
-    default: ${{ github.token }}
   outputs:
     required: false
     description: |

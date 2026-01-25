@@ -1,5 +1,5 @@
 import { setColor, createEmptyGrid, setColorEmpty } from "@snk/types/grid";
-import type { Cell } from "@snk/github-user-contribution";
+import type { Cell } from "@snk/monkeytype-user-contribution";
 import type { Color } from "@snk/types/grid";
 
 export const userContributionToGrid = (cells: Cell[]) => {
