@@ -1,6 +1,6 @@
 name: "generate-snake-game-from-monkeytype-contribution-grid"
 description: "Generates a snake game from a monkeytype user contributions grid. Output the animation as gif or svg"
-author: "platane"
+author: "nihaltp"
 
 runs:
   using: docker
