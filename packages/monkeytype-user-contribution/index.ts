@@ -38,9 +38,19 @@ export const getMonkeytypeUserContribution = async (
   const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
   const today = new Date();
 
-  const startDate = new Date(today);
+  let startDate = new Date(today);
   startDate.setDate(startDate.getDate() - (rawDays.length - 1));
-  const offset = startDate.getDay();
+  let offset = startDate.getDay();
+
+  if (offset > 0) {
+    const daysToTrim = 7 - offset;
+    rawDays = rawDays.slice(daysToTrim);
+
+    // Recalculate start date and offset
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - (rawDays.length - 1));
+    offset = startDate.getDay(); // Should be 0
+  }
 
   const cells = rawDays.map((count, index) => {
     const val = count || 0;

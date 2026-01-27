@@ -17,7 +17,10 @@ test("getMonkeytypeUserContribution with profile endpoint", async () => {
   })))) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user");
-  expect(cells.length).toBe(371); // Should be padded
+  // It trims the array to start on Sunday.
+  // Today is likely random, so length varies, but it should be <= 371
+  expect(cells.length).toBeLessThanOrEqual(371);
+  expect(cells[0].y).toBe(0); // Should always start on Sunday
 
   // Last 5 elements should match input
   const last5 = cells.slice(-5);
@@ -43,7 +46,9 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
   }) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user", { apeKey: "key" });
-  expect(cells.length).toBe(371);
+  expect(cells.length).toBeLessThanOrEqual(371);
+  expect(cells[0].y).toBe(0);
+
   const last3 = cells.slice(-3);
   expect(last3[0].count).toBe(5);
   expect(last3[0].level).toBe(4);
@@ -70,7 +75,7 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
   global.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
     data: {
       testActivity: {
-        testsByDays: new Array(5).fill(1)
+        testsByDays: new Array(371).fill(1)
       }
     }
   })))) as unknown as typeof fetch;
@@ -88,14 +93,16 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
     expect(prevCell.x).toBe(lastCell.x);
 
     // Let's check a cell that crosses the week boundary
-    // Wednesday (3) (index 370)
-    // ...
-    // Sunday (0) (index 367) -> Same x
+    // Wednesday (3). Start date was Thu (4). Offset 4. Trim 3 days. Length 371 - 3 = 368.
+    expect(cells.length).toBe(368);
+    expect(cells[0].y).toBe(0); // Starts on Sunday
+
+    // Sunday (0) (index 367-1-3 = 363) -> Same x
     const sundayCell = cells[cells.length - 1 - 3];
     expect(sundayCell.y).toBe(0);
     expect(sundayCell.x).toBe(lastCell.x);
 
-    // Saturday (6) (index 366) -> Previous x
+    // Saturday (6) (index 367-1-4 = 362) -> Previous x
     const saturdayCell = cells[cells.length - 1 - 4];
     expect(saturdayCell.y).toBe(6);
     expect(saturdayCell.x).toBe(lastCell.x - 1);
