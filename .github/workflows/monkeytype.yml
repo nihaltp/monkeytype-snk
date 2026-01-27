@@ -1,0 +1,34 @@
+name: Monkeytype Snake SVG Generator
+
+permissions:
+  contents: write
+
+on:
+  push:
+    paths:
+      - ".github/workflows/monkeytype.yml"
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Generate Monkeytype Snake SVG
+        uses: nihaltp/monkeytype-snk@main
+        with:
+          monkeytype_user_name: nihaltp
+          outputs: |
+            ./snake_monkeytype/monkeytype-snake-dark.svg?palette=github-dark&color_snake=#fe428e&color_dots=#0a192f,#1e3a8a,#2563eb,#60a5fa,#93c5fd&color_background=#111827
+            ./snake_monkeytype/monkeytype-snake-light.svg?palette=github-light&color_snake=#0ea5e9&color_dots=#e0f2fe,#bae6fd,#7dd3fc,#38bdf8,#0284c7&color_background=#f8fafc
+      
+      - name: Push the SVG to output branch
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: output
+          build_dir: .
+          keep_history: true
+          commit_message: "chore: update snake SVGs"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
