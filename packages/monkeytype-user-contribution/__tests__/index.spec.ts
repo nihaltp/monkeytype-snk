@@ -57,8 +57,8 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
 test("getMonkeytypeUserContribution coordinates align with days of week", async () => {
   // Mock Date to a fixed Wednesday (2024-05-15)
   // Wednesday is day 3 (Sun=0, Mon=1, Tue=2, Wed=3)
-  const fixedDateStr = "2024-05-15T00:00:00.000Z";
   const originalDate = global.Date;
+  const originalFetch = global.fetch;
 
   // @ts-ignore
   global.Date = class extends originalDate {
@@ -67,7 +67,10 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
         // @ts-ignore
         super(...args);
       } else {
-        super(fixedDateStr);
+        // Use local date constructor to ensure getDay() is stable across timezones
+        // 2024-05-15 (Month is 0-indexed, so 4 is May)
+        // @ts-ignore
+        super(2024, 4, 15, 0, 0, 0, 0);
       }
     }
   };
@@ -109,5 +112,6 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
 
   } finally {
     global.Date = originalDate;
+    global.fetch = originalFetch;
   }
 });
