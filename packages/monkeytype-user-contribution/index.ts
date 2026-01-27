@@ -7,19 +7,24 @@
  */
 export const getMonkeytypeUserContribution = async (
   userName: string,
-  options?: { apeKey?: string }
+  options?: { apeKey?: string },
 ) => {
   let json: any;
   if (options?.apeKey) {
-     const res = await fetch(`https://api.monkeytype.com/users/currentTestActivity`, {
-         headers: {
-             "Authorization": `ApeKey ${options.apeKey}`
-         }
-     });
-     json = await res.json();
+    const res = await fetch(
+      `https://api.monkeytype.com/users/currentTestActivity`,
+      {
+        headers: {
+          Authorization: `ApeKey ${options.apeKey}`,
+        },
+      },
+    );
+    json = await res.json();
   } else {
-     const res = await fetch(`https://api.monkeytype.com/users/${userName}/profile?isUid=false`);
-     json = await res.json();
+    const res = await fetch(
+      `https://api.monkeytype.com/users/${userName}/profile?isUid=false`,
+    );
+    json = await res.json();
   }
 
   // monkeytype returns data for a long period, we only need the last year or so for the grid
@@ -27,15 +32,16 @@ export const getMonkeytypeUserContribution = async (
 
   // profile: data.testActivity.testsByDays
   // currentTestActivity: data.testsByDays
-  const testsByDays: (number | null)[] = json.data?.testsByDays ?? json.data?.testActivity?.testsByDays ?? [];
+  const testsByDays: (number | null)[] =
+    json.data?.testsByDays ?? json.data?.testActivity?.testsByDays ?? [];
 
   let rawDays = testsByDays.slice(-371);
   if (rawDays.length < 371) {
-      const padding = new Array(371 - rawDays.length).fill(0);
-      rawDays = [...padding, ...rawDays];
+    const padding = new Array(371 - rawDays.length).fill(0);
+    rawDays = [...padding, ...rawDays];
   }
 
-  const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
+  const maxTests = Math.max(...rawDays.map((d) => d || 0), 1);
   const today = new Date();
 
   let startDate = new Date(today);
@@ -63,16 +69,16 @@ export const getMonkeytypeUserContribution = async (
     const diffDays = rawDays.length - 1 - index;
     const date = new Date(today);
     date.setDate(date.getDate() - diffDays);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
 
     const virtualIndex = index + offset;
 
     return {
       x: Math.floor(virtualIndex / 7), // Column (Week)
-      y: virtualIndex % 7,             // Row (Day)
+      y: virtualIndex % 7, // Row (Day)
       count: val,
-      level: level,             // Required by snk
-      date: dateStr
+      level: level, // Required by snk
+      date: dateStr,
     };
   });
 

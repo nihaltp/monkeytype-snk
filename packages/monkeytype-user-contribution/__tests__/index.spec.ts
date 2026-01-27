@@ -8,13 +8,19 @@ afterEach(() => {
 });
 
 test("getMonkeytypeUserContribution with profile endpoint", async () => {
-  global.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
-    data: {
-      testActivity: {
-        testsByDays: [0, 10, 20, 0, 5]
-      }
-    }
-  })))) as unknown as typeof fetch;
+  global.fetch = mock(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          data: {
+            testActivity: {
+              testsByDays: [0, 10, 20, 0, 5],
+            },
+          },
+        }),
+      ),
+    ),
+  ) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user");
   // It trims the array to start on Sunday.
@@ -34,15 +40,22 @@ test("getMonkeytypeUserContribution with profile endpoint", async () => {
 
 test("getMonkeytypeUserContribution with apeKey", async () => {
   global.fetch = mock((url, init) => {
-      // @ts-ignore
-      if (url.toString().includes("currentTestActivity") && init?.headers?.["Authorization"] === "ApeKey key") {
-           return Promise.resolve(new Response(JSON.stringify({
-                data: {
-                    testsByDays: [5, 5, 5]
-                }
-           })));
-      }
-      return Promise.resolve(new Response("{}"));
+    // @ts-ignore
+    if (
+      url.toString().includes("currentTestActivity") &&
+      init?.headers?.["Authorization"] === "ApeKey key"
+    ) {
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            data: {
+              testsByDays: [5, 5, 5],
+            },
+          }),
+        ),
+      );
+    }
+    return Promise.resolve(new Response("{}"));
   }) as unknown as typeof fetch;
 
   const cells = await getMonkeytypeUserContribution("user", { apeKey: "key" });
@@ -75,13 +88,19 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
     }
   };
 
-  global.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
-    data: {
-      testActivity: {
-        testsByDays: new Array(371).fill(1)
-      }
-    }
-  })))) as unknown as typeof fetch;
+  global.fetch = mock(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          data: {
+            testActivity: {
+              testsByDays: new Array(371).fill(1),
+            },
+          },
+        }),
+      ),
+    ),
+  ) as unknown as typeof fetch;
 
   try {
     const cells = await getMonkeytypeUserContribution("user");
@@ -109,7 +128,6 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
     const saturdayCell = cells[cells.length - 1 - 4];
     expect(saturdayCell.y).toBe(6);
     expect(saturdayCell.x).toBe(lastCell.x - 1);
-
   } finally {
     global.Date = originalDate;
     global.fetch = originalFetch;
