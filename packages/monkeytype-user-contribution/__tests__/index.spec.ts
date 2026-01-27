@@ -48,3 +48,59 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
   expect(last3[0].count).toBe(5);
   expect(last3[0].level).toBe(4);
 });
+
+test("getMonkeytypeUserContribution coordinates align with days of week", async () => {
+  // Mock Date to a fixed Wednesday (2024-05-15)
+  // Wednesday is day 3 (Sun=0, Mon=1, Tue=2, Wed=3)
+  const fixedDateStr = "2024-05-15T00:00:00.000Z";
+  const originalDate = global.Date;
+
+  // @ts-ignore
+  global.Date = class extends originalDate {
+    constructor(...args: any[]) {
+      if (args.length) {
+        // @ts-ignore
+        super(...args);
+      } else {
+        super(fixedDateStr);
+      }
+    }
+  };
+
+  global.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
+    data: {
+      testActivity: {
+        testsByDays: new Array(5).fill(1)
+      }
+    }
+  })))) as unknown as typeof fetch;
+
+  try {
+    const cells = await getMonkeytypeUserContribution("user");
+
+    // The last cell corresponds to Today (Wed, y=3)
+    const lastCell = cells[cells.length - 1];
+    expect(lastCell.y).toBe(3);
+
+    // The cell before that is Tue (y=2)
+    const prevCell = cells[cells.length - 2];
+    expect(prevCell.y).toBe(2);
+    expect(prevCell.x).toBe(lastCell.x);
+
+    // Let's check a cell that crosses the week boundary
+    // Wednesday (3) (index 370)
+    // ...
+    // Sunday (0) (index 367) -> Same x
+    const sundayCell = cells[cells.length - 1 - 3];
+    expect(sundayCell.y).toBe(0);
+    expect(sundayCell.x).toBe(lastCell.x);
+
+    // Saturday (6) (index 366) -> Previous x
+    const saturdayCell = cells[cells.length - 1 - 4];
+    expect(saturdayCell.y).toBe(6);
+    expect(saturdayCell.x).toBe(lastCell.x - 1);
+
+  } finally {
+    global.Date = originalDate;
+  }
+});

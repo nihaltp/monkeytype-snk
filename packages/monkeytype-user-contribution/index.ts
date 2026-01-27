@@ -38,6 +38,10 @@ export const getMonkeytypeUserContribution = async (
   const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
   const today = new Date();
 
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - (rawDays.length - 1));
+  const offset = startDate.getDay();
+
   const cells = rawDays.map((count, index) => {
     const val = count || 0;
     let level = 0;
@@ -51,9 +55,11 @@ export const getMonkeytypeUserContribution = async (
     date.setDate(date.getDate() - diffDays);
     const dateStr = date.toISOString().split('T')[0];
 
+    const virtualIndex = index + offset;
+
     return {
-      x: Math.floor(index / 7), // Column (Week)
-      y: index % 7,             // Row (Day)
+      x: Math.floor(virtualIndex / 7), // Column (Week)
+      y: virtualIndex % 7,             // Row (Day)
       count: val,
       level: level,             // Required by snk
       date: dateStr
