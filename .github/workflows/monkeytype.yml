@@ -16,7 +16,7 @@ jobs:
     
     steps:
       - name: Generate Monkeytype Snake SVG
-        uses: nihaltp/monkeytype-snk@main
+        uses: nihaltp/monkeytype-snk@fix-monkeytype-grid-alignment-919999551848709484
         with:
           monkeytype_user_name: nihaltp
           outputs: |
