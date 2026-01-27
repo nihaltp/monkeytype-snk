@@ -48,3 +48,21 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
   expect(last3[0].count).toBe(5);
   expect(last3[0].level).toBe(4);
 });
+
+test("ensure today has minimum level 1 even if count is 0", async () => {
+  // Mock data with 0 activity for today
+  global.fetch = mock(() => Promise.resolve(new Response(JSON.stringify({
+    data: {
+      testActivity: {
+        testsByDays: [10, 20, 0] // Last is 0
+      }
+    }
+  })))) as unknown as typeof fetch;
+
+  const cells = await getMonkeytypeUserContribution("user");
+  const lastCell = cells[cells.length - 1];
+
+  // Should have minimum level 1
+  expect(lastCell.count).toBe(0);
+  expect(lastCell.level).toBe(1);
+});

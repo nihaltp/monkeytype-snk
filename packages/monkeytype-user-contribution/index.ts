@@ -45,6 +45,12 @@ export const getMonkeytypeUserContribution = async (
       level = Math.ceil((val / maxTests) * 4);
     }
 
+    // Ensure the current day (last cell) always has a minimum level of 1
+    // This ensures the snake has a target even if no activity occurred today
+    if (index === rawDays.length - 1 && level === 0) {
+      level = 1;
+    }
+
     // Calculate date assuming the last element is today
     const diffDays = rawDays.length - 1 - index;
     const date = new Date(today);
