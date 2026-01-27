@@ -22,7 +22,7 @@ test("getMonkeytypeUserContribution with profile endpoint", async () => {
     ),
   ) as unknown as typeof fetch;
 
-  const cells = await getMonkeytypeUserContribution("user");
+  const cells = await getMonkeytypeUserContribution("nihaltp");
   // It trims the array to start on Sunday.
   // Today is likely random, so length varies, but it should be <= 371
   expect(cells.length).toBeLessThanOrEqual(371);
@@ -58,7 +58,7 @@ test("getMonkeytypeUserContribution with apeKey", async () => {
     return Promise.resolve(new Response("{}"));
   }) as unknown as typeof fetch;
 
-  const cells = await getMonkeytypeUserContribution("user", { apeKey: "key" });
+  const cells = await getMonkeytypeUserContribution("nihaltp", { apeKey: "key" });
   expect(cells.length).toBeLessThanOrEqual(371);
   expect(cells[0].y).toBe(0);
 
@@ -103,7 +103,7 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
   ) as unknown as typeof fetch;
 
   try {
-    const cells = await getMonkeytypeUserContribution("user");
+    const cells = await getMonkeytypeUserContribution("nihaltp");
 
     // The last cell corresponds to Today (Wed, y=3)
     const lastCell = cells[cells.length - 1];
