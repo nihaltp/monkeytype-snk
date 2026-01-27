@@ -44,19 +44,19 @@ export const getMonkeytypeUserContribution = async (
   const maxTests = Math.max(...rawDays.map((d) => d || 0), 1);
   const today = new Date();
 
-  let startDate = new Date(today);
+  const startDate = new Date(today);
   startDate.setDate(startDate.getDate() - (rawDays.length - 1));
-  let offset = startDate.getDay();
+  const offset = startDate.getDay();
 
   if (offset > 0) {
     const daysToTrim = 7 - offset;
+    // rawDays is guaranteed to be at least 371 long here (padded above),
+    // so trimming up to 6 days is always safe.
     rawDays = rawDays.slice(daysToTrim);
-
-    // Recalculate start date and offset
-    startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - (rawDays.length - 1));
-    offset = startDate.getDay(); // Should be 0
   }
+
+  // After trimming, the array always starts on a Sunday (offset 0).
+  // Thus index 0 is Sunday, index 1 is Monday, etc.
 
   const cells = rawDays.map((count, index) => {
     const val = count || 0;
@@ -71,11 +71,9 @@ export const getMonkeytypeUserContribution = async (
     date.setDate(date.getDate() - diffDays);
     const dateStr = date.toISOString().split("T")[0];
 
-    const virtualIndex = index + offset;
-
     return {
-      x: Math.floor(virtualIndex / 7), // Column (Week)
-      y: virtualIndex % 7, // Row (Day)
+      x: Math.floor(index / 7), // Column (Week)
+      y: index % 7, // Row (Day)
       count: val,
       level: level, // Required by snk
       date: dateStr,

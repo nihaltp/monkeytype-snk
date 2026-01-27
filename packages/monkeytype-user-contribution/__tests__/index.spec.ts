@@ -119,12 +119,12 @@ test("getMonkeytypeUserContribution coordinates align with days of week", async 
     expect(cells.length).toBe(368);
     expect(cells[0].y).toBe(0); // Starts on Sunday
 
-    // Sunday (0) (index 367-1-3 = 363) -> Same x
+    // Sunday (0) (index 368-1-3 = 364) -> Same x
     const sundayCell = cells[cells.length - 1 - 3];
     expect(sundayCell.y).toBe(0);
     expect(sundayCell.x).toBe(lastCell.x);
 
-    // Saturday (6) (index 367-1-4 = 362) -> Previous x
+    // Saturday (6) (index 368-1-4 = 363) -> Previous x
     const saturdayCell = cells[cells.length - 1 - 4];
     expect(saturdayCell.y).toBe(6);
     expect(saturdayCell.x).toBe(lastCell.x - 1);
