@@ -22,7 +22,9 @@ import * as githubAction from "./github-action";
     const { generateContributionSnake } = await import(
       "./generateContributionSnake"
     );
-    const results = await generateContributionSnake(userName, outputs, { monkeytypeApeKey });
+    const results = await generateContributionSnake(userName, outputs, {
+      monkeytypeApeKey,
+    });
 
     outputs.forEach((out, i) => {
       const result = results[i];

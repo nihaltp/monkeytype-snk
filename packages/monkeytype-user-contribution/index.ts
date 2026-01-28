@@ -7,19 +7,24 @@
  */
 export const getMonkeytypeUserContribution = async (
   userName: string,
-  options?: { apeKey?: string }
+  options?: { apeKey?: string },
 ) => {
   let json: any;
   if (options?.apeKey) {
-     const res = await fetch(`https://api.monkeytype.com/users/currentTestActivity`, {
-         headers: {
-             "Authorization": `ApeKey ${options.apeKey}`
-         }
-     });
-     json = await res.json();
+    const res = await fetch(
+      `https://api.monkeytype.com/users/currentTestActivity`,
+      {
+        headers: {
+          Authorization: `ApeKey ${options.apeKey}`,
+        },
+      },
+    );
+    json = await res.json();
   } else {
-     const res = await fetch(`https://api.monkeytype.com/users/${userName}/profile?isUid=false`);
-     json = await res.json();
+    const res = await fetch(
+      `https://api.monkeytype.com/users/${userName}/profile?isUid=false`,
+    );
+    json = await res.json();
   }
 
   // monkeytype returns data for a long period, we only need the last year or so for the grid
@@ -27,16 +32,31 @@ export const getMonkeytypeUserContribution = async (
 
   // profile: data.testActivity.testsByDays
   // currentTestActivity: data.testsByDays
-  const testsByDays: (number | null)[] = json.data?.testsByDays ?? json.data?.testActivity?.testsByDays ?? [];
+  const testsByDays: (number | null)[] =
+    json.data?.testsByDays ?? json.data?.testActivity?.testsByDays ?? [];
 
   let rawDays = testsByDays.slice(-371);
   if (rawDays.length < 371) {
-      const padding = new Array(371 - rawDays.length).fill(0);
-      rawDays = [...padding, ...rawDays];
+    const padding = new Array(371 - rawDays.length).fill(0);
+    rawDays = [...padding, ...rawDays];
   }
 
-  const maxTests = Math.max(...rawDays.map(d => d || 0), 1);
+  const maxTests = Math.max(...rawDays.map((d) => d || 0), 1);
   const today = new Date();
+
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - (rawDays.length - 1));
+  const offset = startDate.getDay();
+
+  if (offset > 0) {
+    const daysToTrim = 7 - offset;
+    // rawDays is guaranteed to be at least 371 long here (padded above),
+    // so trimming up to 6 days is always safe.
+    rawDays = rawDays.slice(daysToTrim);
+  }
+
+  // After trimming, the array always starts on a Sunday (offset 0).
+  // Thus index 0 is Sunday, index 1 is Monday, etc.
 
   const cells = rawDays.map((count, index) => {
     const val = count || 0;
@@ -49,14 +69,14 @@ export const getMonkeytypeUserContribution = async (
     const diffDays = rawDays.length - 1 - index;
     const date = new Date(today);
     date.setDate(date.getDate() - diffDays);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().split("T")[0];
 
     return {
       x: Math.floor(index / 7), // Column (Week)
-      y: index % 7,             // Row (Day)
+      y: index % 7, // Row (Day)
       count: val,
-      level: level,             // Required by snk
-      date: dateStr
+      level: level, // Required by snk
+      date: dateStr,
     };
   });
 

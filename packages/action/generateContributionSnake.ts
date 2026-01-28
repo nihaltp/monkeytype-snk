@@ -13,10 +13,12 @@ export const generateContributionSnake = async (
     drawOptions: DrawOptions;
     animationOptions: AnimationOptions;
   } | null)[],
-  options?: { monkeytypeApeKey?: string }
+  options?: { monkeytypeApeKey?: string },
 ) => {
   console.log("🎣 fetching monkeytype user contribution");
-  const cells = await getMonkeytypeUserContribution(userName, { apeKey: options?.monkeytypeApeKey });
+  const cells = await getMonkeytypeUserContribution(userName, {
+    apeKey: options?.monkeytypeApeKey,
+  });
 
   const grid = userContributionToGrid(cells);
   const snake = snake4;
